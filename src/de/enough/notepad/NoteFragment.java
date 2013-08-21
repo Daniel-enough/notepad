@@ -15,12 +15,11 @@ public class NoteFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 	        Bundle savedInstanceState) {
-		// Inflate the layout for this fragment
+
 		View contentView = inflater.inflate(R.layout.fragment_note, container, false);
 		setupInput(contentView);
 		return contentView;
 	}
-	
 	
 	public void setupInput(View contentView) {
 		mInputTitle = (EditText) contentView.findViewById(R.id.input_title);
