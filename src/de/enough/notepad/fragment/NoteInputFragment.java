@@ -1,7 +1,5 @@
-package de.enough.notepad;
+package de.enough.notepad.fragment;
 
-import de.enough.notepad.MainActivity.OnBackKeyListener;
-import de.enough.notepad.provider.NotesProvider;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -16,11 +14,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
+import de.enough.notepad.MainActivity.OnBackKeyListener;
+import de.enough.notepad.R;
+import de.enough.notepad.provider.NotesProvider;
 
-public class NoteFragment extends Fragment implements OnBackKeyListener {
+public class NoteInputFragment extends Fragment implements OnBackKeyListener {
 
 	
-	private static final String TAG = NoteFragment.class.getName();
+	private static final String TAG = NoteInputFragment.class.getName();
 
 	private Context mContext;
 	private ContentResolver mContentResolver;
@@ -38,7 +39,7 @@ public class NoteFragment extends Fragment implements OnBackKeyListener {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 	        Bundle savedInstanceState) {
 
-		View contentView = inflater.inflate(R.layout.fragment_note, container, false);
+		View contentView = inflater.inflate(R.layout.fragment_note_input, container, false);
 		setupInput(contentView);
 		return contentView;
 	}
@@ -81,6 +82,10 @@ public class NoteFragment extends Fragment implements OnBackKeyListener {
 		values.put(NotesProvider.KEY_DESCRIPTION, description);
 		values.put(NotesProvider.KEY_TIMESTAMP, timestamp);
 		mContentResolver.insert(NotesProvider.CONTENT_URI, values); 
+		
+		mInputTitle.getText().clear();
+		mInputDescription.getText().clear();
+		
 		return true;
 	}
 	
@@ -100,7 +105,9 @@ public class NoteFragment extends Fragment implements OnBackKeyListener {
 	@Override
 	public boolean onBackKeyDown() {
 		String title = mInputTitle.getText().toString();
+		title = title.trim();
 		String description = mInputDescription.getText().toString();
+		description = description.trim();
 		Long timestamp = System.currentTimeMillis();
 		
 		if (TextUtils.isEmpty(title.trim()) && TextUtils.isEmpty(description.trim())) {
