@@ -20,7 +20,6 @@ public class MainActivity extends FragmentActivity implements Listener {
 	
 	private static final String TAG_FRAGMENT_NOTE_LIST = NoteListFragment.class.getName();
 	private static final String TAG_FRAGMENT_NOTE_INPUT = NoteInputFragment.class.getName();
-	private static final String EXTRA_NOTE_ID = "id";
 	
 	private NoteListFragment mNoteListFragment;
 
@@ -103,7 +102,7 @@ public class MainActivity extends FragmentActivity implements Listener {
 	@Override
 	public void onNoteSelected(long id) {
 		Bundle data = new Bundle();
-		data.putLong(EXTRA_NOTE_ID, id);
+		data.putLong(NoteInputFragment.EXTRA_NOTE_ID , id);
 		showInput(data);
 	}
 	
