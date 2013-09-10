@@ -13,16 +13,18 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import de.enough.notepad.R;
 import de.enough.notepad.adapter.NotesAdapter;
-import de.enough.notepad.fragment.NoteListFragment.Listener;
 import de.enough.notepad.provider.NotesProvider;
 
 public class NoteListFragment extends Fragment {
 	
 	public interface Listener {
 		public void onNewNote();
+		public void onNoteSelected(long id);
 	}
 	
 	private Context mContext;
@@ -36,8 +38,16 @@ public class NoteListFragment extends Fragment {
 		View contentView = inflater.inflate(R.layout.fragment_note_list, container, false);
 		
 		setHasOptionsMenu(true);
-
+		
 		return contentView;
+	}
+	
+	@Override
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+		
+		ListView list = (ListView)getView().findViewById(R.id.list);
+		list.setOnItemClickListener(createOnItemClickListener());	
 	}
 
 	@Override
@@ -78,5 +88,20 @@ public class NoteListFragment extends Fragment {
 		default:
 			return super.onOptionsItemSelected(item);
 		}
+	}
+	
+	public OnItemClickListener createOnItemClickListener() {
+		
+		return new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position,
+					long id) {
+				
+				Activity activity = getActivity();
+				if (activity instanceof Listener) {
+					((Listener) activity).onNoteSelected(id);
+				}	
+			}
+		};
 	}
 }

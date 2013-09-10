@@ -7,7 +7,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentManager.BackStackEntry;
 import android.support.v4.app.FragmentTransaction;
 import android.view.KeyEvent;
-import android.view.Menu;
 import android.widget.RelativeLayout;
 import de.enough.notepad.fragment.NoteInputFragment;
 import de.enough.notepad.fragment.NoteListFragment;
@@ -21,9 +20,9 @@ public class MainActivity extends FragmentActivity implements Listener {
 	
 	private static final String TAG_FRAGMENT_NOTE_LIST = NoteListFragment.class.getName();
 	private static final String TAG_FRAGMENT_NOTE_INPUT = NoteInputFragment.class.getName();
+	private static final String EXTRA_NOTE_ID = "id";
 	
 	private NoteListFragment mNoteListFragment;
-	private NoteInputFragment mNoteInputFragment;
 
 	
 	@Override
@@ -41,13 +40,6 @@ public class MainActivity extends FragmentActivity implements Listener {
 		showList();
 	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.menu_list, menu);
-		return true;
-	}
-	
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		Fragment fragmentOnBackStack = getFragmentOnBackStack();
@@ -71,7 +63,6 @@ public class MainActivity extends FragmentActivity implements Listener {
 	
 	private void setupFragments() {
 		mNoteListFragment = new NoteListFragment();
-		mNoteInputFragment = new NoteInputFragment();
 	}
 	
 	public Fragment getFragmentOnBackStack() {
@@ -93,15 +84,27 @@ public class MainActivity extends FragmentActivity implements Listener {
 		fragmentTransaction.commit();  
 	}
 	
-	public void showInput() {
+	public void showInput(Bundle data) {
+		
+		NoteInputFragment noteInputFragment = new NoteInputFragment();
+		noteInputFragment.setArguments(data);
+		
 		FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-		fragmentTransaction.replace(R.id.layout_holder, mNoteInputFragment, TAG_FRAGMENT_NOTE_INPUT);
+		fragmentTransaction.replace(R.id.layout_holder, noteInputFragment, TAG_FRAGMENT_NOTE_INPUT);
 		fragmentTransaction.addToBackStack(TAG_FRAGMENT_NOTE_INPUT); 		
-		fragmentTransaction.commit();  
+		fragmentTransaction.commit(); 
+	}
+	
+	@Override
+	public void onNewNote() {
+		showInput(null);	
 	}
 
 	@Override
-	public void onNewNote() {
-		showInput();	
+	public void onNoteSelected(long id) {
+		Bundle data = new Bundle();
+		data.putLong(EXTRA_NOTE_ID, id);
+		showInput(data);
 	}
+	
 }
