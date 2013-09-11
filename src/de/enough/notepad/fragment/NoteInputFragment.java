@@ -35,7 +35,7 @@ public class NoteInputFragment extends Fragment implements OnBackKeyListener {
 	private String mTitleInDatabase;
 	private String mDescriptionInDatabase;
 
-	private boolean isUpdate;
+	private boolean mIsUpdate;
 	private boolean mTitleChanged;
 	private boolean mDescriptionChanged;
 	
@@ -60,9 +60,9 @@ public class NoteInputFragment extends Fragment implements OnBackKeyListener {
 		
 		Bundle data = getArguments();
 		
-		isUpdate = data != null;
+		mIsUpdate = data != null;
 		
-		if (isUpdate) {
+		if (mIsUpdate) {
 			setStringsFromDatabase(data);
 			setEditText(data);
 		}
@@ -83,7 +83,7 @@ public class NoteInputFragment extends Fragment implements OnBackKeyListener {
 	@Override
 	public boolean onBackKeyDown() {
 		
-		if (isUpdate) {
+		if (mIsUpdate) {
 			Bundle data = getArguments();
 			boolean getBack = updateNote(data);	
 			return getBack;
@@ -206,7 +206,7 @@ public class NoteInputFragment extends Fragment implements OnBackKeyListener {
 			return false;
 		}
 		
-		if (checkIfNoteExists(title) && !mTitleInDatabase.equals(title)) {
+		if (checkIfNoteExists(title) && !mTitleInDatabase.equalsIgnoreCase(title)) {
 			String message = "Note: " + title + " allready exists"; 
 			Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show();
 			return false;
@@ -276,9 +276,9 @@ public class NoteInputFragment extends Fragment implements OnBackKeyListener {
 		String descriptionInEditText = mInputDescription.getText().toString();
 		descriptionInEditText = descriptionInEditText.trim();
 
-		if (isUpdate) {
-			mTitleChanged = !mTitleInDatabase.equals(titleInEditText);
-			mDescriptionChanged = !mDescriptionInDatabase.equals(descriptionInEditText);
+		if (mIsUpdate) {
+			mTitleChanged = !mTitleInDatabase.equalsIgnoreCase(titleInEditText);
+			mDescriptionChanged = !mDescriptionInDatabase.equalsIgnoreCase(descriptionInEditText);
 		}
 	}
 	

@@ -94,16 +94,24 @@ public class MainActivity extends FragmentActivity implements Listener {
 		fragmentTransaction.commit(); 
 	}
 	
+	public void showCreateNote() {
+		showInput(null);
+	}
+	
+	public void showUpdateNote(long id) {
+		Bundle data = new Bundle();
+		data.putLong(NoteInputFragment.EXTRA_NOTE_ID , id);
+		showInput(data);
+	}
+	
 	@Override
 	public void onNewNote() {
-		showInput(null);	
+		showCreateNote();	
 	}
 
 	@Override
 	public void onNoteSelected(long id) {
-		Bundle data = new Bundle();
-		data.putLong(NoteInputFragment.EXTRA_NOTE_ID , id);
-		showInput(data);
+		showUpdateNote(id);	
 	}
 	
 }
