@@ -43,7 +43,6 @@ public class NoteListFragment extends Fragment implements LoaderCallbacks<Cursor
 
 	private NotesAdapter mAdapter;
 	
-	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 	        Bundle savedInstanceState) {
@@ -51,6 +50,7 @@ public class NoteListFragment extends Fragment implements LoaderCallbacks<Cursor
 		View contentView = inflater.inflate(R.layout.fragment_note_list, container, false);
 		
 		setHasOptionsMenu(true);
+		
 		getLoaderManager().initLoader(0, null, this);
 
 		return contentView;
@@ -159,6 +159,4 @@ public class NoteListFragment extends Fragment implements LoaderCallbacks<Cursor
 	public void onLoaderReset(Loader<Cursor> loader) {
 		mAdapter.swapCursor(null);
 	}
-	
->>>>>>> 3cc5c3d... NOTEPAD-9
 }

@@ -38,11 +38,6 @@ public class MainActivity extends FragmentActivity implements Listener {
 		setupFragments();
 		showList();
 	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		return true;
-	}
 	
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
