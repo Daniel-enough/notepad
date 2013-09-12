@@ -2,10 +2,15 @@ package de.enough.notepad.fragment;
 
 import android.app.Activity;
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -23,17 +28,17 @@ import de.enough.notepad.R;
 import de.enough.notepad.adapter.NotesAdapter;
 import de.enough.notepad.provider.NotesProvider;
 
-public class NoteListFragment extends Fragment {
+public class NoteListFragment extends Fragment implements LoaderCallbacks<Cursor> {
 	
 	public interface Listener {
 		public void onNewNote();
 	}
 	
-	private static final String CONTEXT_MENU_ITEM_HEADER_TITLE = "Delete";
+	private static final String CONTEXT_MENU_ITEM_HEADER_TITLE = "Delete note";
 	private static final String CONTEXT_MENU_ITEM_DELETE = "Delete";
 	private Context mContext;
 	private ContentResolver mContentResolver;
-	 
+	private NotesAdapter mAdapter;
 	
 	
 	@Override
@@ -43,6 +48,8 @@ public class NoteListFragment extends Fragment {
 		View contentView = inflater.inflate(R.layout.fragment_note_list, container, false);
 		
 		setHasOptionsMenu(true);
+		
+		getLoaderManager().initLoader(0, null, this);
 
 		return contentView;
 	}
@@ -51,12 +58,10 @@ public class NoteListFragment extends Fragment {
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 
-		Cursor cursor = mContentResolver.query(NotesProvider.CONTENT_URI, null, null,
-				null, NotesProvider.KEY_TIMESTAMP + " DESC");
-		NotesAdapter adapter = new NotesAdapter(mContext, cursor, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER );
+		mAdapter = new NotesAdapter(mContext, null, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER );
 		
 		ListView list = (ListView)getView().findViewById(R.id.list);
-		list.setAdapter(adapter);
+		list.setAdapter(mAdapter);
 		registerForContextMenu(list);
 	}
 	
@@ -109,7 +114,25 @@ public class NoteListFragment extends Fragment {
 	}
 	
 	public void deleteSelectedNote(long id) {
-		Toast.makeText(mContext, "ID: "+id, Toast.LENGTH_SHORT).show();
+		Uri selectedNoteUri = ContentUris.withAppendedId(NotesProvider.CONTENT_URI, id);
+		mContentResolver.delete(selectedNoteUri, "", null);
+		String message = "Note has been deleted";
+		Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show();
+	}
+
+	@Override
+	public Loader<Cursor> onCreateLoader(int arg0, Bundle bundle) {
+		return new CursorLoader(mContext, NotesProvider.CONTENT_URI, null, null, null, NotesProvider.KEY_TIMESTAMP + " DESC ");
+	}
+
+	@Override
+	public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+		mAdapter.swapCursor(cursor);	
+	}
+
+	@Override
+	public void onLoaderReset(Loader<Cursor> loader) {
+		mAdapter.swapCursor(null);
 	}
 	
 }
