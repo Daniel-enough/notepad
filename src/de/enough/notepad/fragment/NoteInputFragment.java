@@ -21,10 +21,13 @@ import de.enough.notepad.MainActivity.OnBackKeyListener;
 import de.enough.notepad.R;
 import de.enough.notepad.provider.NotesProvider;
 
+
 public class NoteInputFragment extends Fragment implements OnBackKeyListener {
 
-	
 	public static final String EXTRA_NOTE_ID = "id";
+	
+	private static final String STATE_TITLE = "savedTitle";
+	private static final String STATE_DESCRIPTION = "savedDescription";
 
 	private Context mContext;
 	private ContentResolver mContentResolver;
@@ -39,10 +42,20 @@ public class NoteInputFragment extends Fragment implements OnBackKeyListener {
 	private boolean mTitleChanged;
 	private boolean mDescriptionChanged;
 	
-
+	
+	@Override
+	public void onAttach(Activity activity) {
+		mContext = getActivity().getBaseContext();
+		mContentResolver = mContext.getContentResolver();		
+		super.onAttach(activity);
+	} 
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		mTitleChanged = false;
+		mDescriptionChanged = false;
 	}
 	
 	@Override
@@ -56,7 +69,7 @@ public class NoteInputFragment extends Fragment implements OnBackKeyListener {
 	}
 	
 	@Override
-	public void onStart() {
+	public void onViewStateRestored(Bundle savedInstanceState) {
 		
 		Bundle data = getArguments();
 		mIsUpdate = data != null;
@@ -64,19 +77,29 @@ public class NoteInputFragment extends Fragment implements OnBackKeyListener {
 			setStringsFromDatabase(data);
 			setEditText(data);
 		}
-		
-		mTitleChanged = false;
-		mDescriptionChanged = false;
-		
-		super.onStart();
+
+		if (savedInstanceState != null) {
+	
+			String stateTitle = savedInstanceState.getString(STATE_TITLE);
+			String stateDescription = savedInstanceState.getString(STATE_DESCRIPTION);
+
+			mInputTitle.setText(stateTitle);
+			mInputDescription.setText(stateDescription);
+		}
+		super.onViewStateRestored(savedInstanceState);
 	}
 
 	@Override
-	public void onAttach(Activity activity) {
-		mContext = getActivity().getBaseContext();
-		mContentResolver = mContext.getContentResolver();		
-		super.onAttach(activity);
-	} 
+	public void onSaveInstanceState(Bundle saveInstanceState) {
+		
+		String stateTitle = mInputTitle.getText().toString();
+		String stateDescription = mInputDescription.getText().toString();
+		
+		saveInstanceState.putString(STATE_TITLE, stateTitle);
+		saveInstanceState.putString(STATE_DESCRIPTION, stateDescription);
+		
+		super.onSaveInstanceState(saveInstanceState);
+	}
 	
 	@Override
 	public boolean onBackKeyDown() {
@@ -121,7 +144,7 @@ public class NoteInputFragment extends Fragment implements OnBackKeyListener {
 	
 	public boolean checkIfNoteExists(String title) {
 		
-		String selection = NotesProvider.KEY_TITLE + "=?";
+		String selection = NotesProvider.KEY_TITLE + "=? COLLATE NOCASE";
 		String[] selectionArgs = {title};
 		
 		Cursor cursor = mContentResolver.query(NotesProvider.CONTENT_URI, null, 
@@ -157,7 +180,7 @@ public class NoteInputFragment extends Fragment implements OnBackKeyListener {
 
 		boolean noteExists = checkIfNoteExists(title);
 		if (noteExists) {
-			String message = "Note: " + title + " allready exists"; 
+			String message = "Note <" + title + "> allready exists"; 
 			Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show();
 			return false;
 		}
@@ -168,7 +191,7 @@ public class NoteInputFragment extends Fragment implements OnBackKeyListener {
 		values.put(NotesProvider.KEY_TIMESTAMP, timestamp);
 		mContentResolver.insert(NotesProvider.CONTENT_URI, values);
 		
-		String message = "Note: " + title + " added"; 
+		String message = "Note <" + title + "> added"; 
 		Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show();
 		
 		return true;
@@ -204,7 +227,7 @@ public class NoteInputFragment extends Fragment implements OnBackKeyListener {
 		}
 		
 		if (checkIfNoteExists(title) && !mTitleInDatabase.equalsIgnoreCase(title)) {
-			String message = "Note: " + title + " allready exists"; 
+			String message = "Note <" + title + "> allready exists"; 
 			Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show();
 			return false;
 		}
@@ -278,5 +301,6 @@ public class NoteInputFragment extends Fragment implements OnBackKeyListener {
 			mDescriptionChanged = !mDescriptionInDatabase.equalsIgnoreCase(descriptionInEditText);
 		}
 	}
+	
 	
 }
