@@ -40,7 +40,6 @@ public class NoteListFragment extends Fragment implements LoaderCallbacks<Cursor
 	private static final String CONTEXT_MENU_ITEM_DELETE = "Delete";
 	private Context mContext;
 	private ContentResolver mContentResolver;
-
 	private NotesAdapter mAdapter;
 	
 	
@@ -159,6 +158,4 @@ public class NoteListFragment extends Fragment implements LoaderCallbacks<Cursor
 	public void onLoaderReset(Loader<Cursor> loader) {
 		mAdapter.swapCursor(null);
 	}
-	
->>>>>>> 3cc5c3d... NOTEPAD-9
 }
